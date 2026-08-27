@@ -17,7 +17,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui
 button{font:inherit}
 .app{min-height:100vh;display:grid;grid-template-columns:360px 1fr}
 .sidebar{position:sticky;top:0;height:100vh;overflow:auto;background:var(--panel);border-right:1px solid var(--line);padding:26px 18px}
-.brand{padding:4px 10px 22px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.brand{padding:4px 10px 22px;border-bottom:1px solid var(--line);margin-bottom:14px;display:block;text-decoration:none;color:inherit;border-radius:12px;cursor:pointer}
+.brand:hover{background:#f4f6fa}
+.brand:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
 .brand h1{font-size:21px;margin:0 0 4px}
 .brand p{margin:0;color:var(--muted);font-size:13px}
 .search{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;outline:none;margin-bottom:14px}
@@ -34,10 +36,16 @@ button{font:inherit}
 .hero h2{font-size:clamp(34px,5vw,64px);line-height:1.02;margin:13px 0 18px;max-width:850px}
 .hero p{max-width:850px;color:#c8d0dc;font-size:18px;margin:0}
 .quote{margin-top:28px;padding:18px 20px;border-left:3px solid #7f96ff;background:rgba(255,255,255,.06);max-width:850px;font-size:17px}
+.start-cta{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:var(--accent);color:white;text-decoration:none;padding:14px 18px;border-radius:12px;font-weight:800;box-shadow:0 14px 40px rgba(49,94,251,.35)}
+.start-cta:hover{filter:brightness(1.05)}
+.start-cta:focus-visible{outline:3px solid rgba(237,242,255,.95);outline-offset:3px}
+.start-cta .arrow{font-size:18px;line-height:1}
 .content{max-width:1000px;margin:auto;padding:42px clamp(24px,5vw,80px) 80px}
 .overview{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:var(--shadow)}
 .stat strong{display:block;font-size:24px}.stat span{font-size:12px;color:var(--muted)}
+.view{display:none}
+.view.active{display:block}
 .section{display:none}
 .section.active{display:block}
 .kicker{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:12px}
@@ -73,30 +81,36 @@ footer{color:var(--muted);text-align:center;padding:25px}
 <body>
 <div class="app">
 <aside class="sidebar">
-  <div class="brand">
+  <a class="brand" id="brandLink" href="#inicio">
     <h1>Projeto Humano</h1>
     <p>26 passos para construir uma vida capaz, saudável, culta, próspera e livre.</p>
-  </div>
+  </a>
   <input id="search" class="search" placeholder="Buscar nos 26 passos..." aria-label="Buscar">
   <nav id="nav" class="nav"></nav>
 </aside>
 
 <main class="main">
-<header class="hero">
-  <div class="eyebrow">Sistema de desenvolvimento pessoal</div>
-  <h2>Uma vida que vale a pena viver.</h2>
-  <p>Um mapa para desenvolver corpo, inteligência, cultura, competência, prosperidade, relacionamentos, equilíbrio emocional e liberdade — sem transformar a vida em uma corrida interminável de produtividade.</p>
-  <div class="quote">“O objetivo não é ficar ocupado tentando ser uma pessoa melhor. É construir uma vida que funcione bem.”</div>
-</header>
+<div id="homeView" class="view active">
+  <header class="hero" id="inicio">
+    <div class="eyebrow">Sistema de desenvolvimento pessoal</div>
+    <h2>Uma vida que vale a pena viver.</h2>
+    <p>Um mapa para desenvolver corpo, inteligência, cultura, competência, prosperidade, relacionamentos, equilíbrio emocional e liberdade — sem transformar a vida em uma corrida interminável de produtividade.</p>
+    <div class="quote">“O objetivo não é ficar ocupado tentando ser uma pessoa melhor. É construir uma vida que funcione bem.”</div>
+    <a class="start-cta" id="startReading" href="#passo-01">Começar pelo Passo 1 <span class="arrow">→</span></a>
+  </header>
+
+  <div class="content">
+  <section class="overview">
+    <div class="stat"><strong>26</strong><span>passos do sistema</span></div>
+    <div class="stat"><strong>8</strong><span>pilares principais</span></div>
+    <div class="stat"><strong>10 anos</strong><span>visão de construção</span></div>
+    <div class="stat"><strong>1</strong><span>objetivo: liberdade</span></div>
+  </section>
+  </div>
+</div>
 
 <div class="content">
-<section class="overview">
-  <div class="stat"><strong>26</strong><span>passos do sistema</span></div>
-  <div class="stat"><strong>8</strong><span>pilares principais</span></div>
-  <div class="stat"><strong>10 anos</strong><span>visão de construção</span></div>
-  <div class="stat"><strong>1</strong><span>objetivo: liberdade</span></div>
-</section>
-<div id="sections"></div>
+  <div id="sections"></div>
 </div>
 <footer>Projeto Humano — construir capacidade, autonomia e uma vida que vale a pena viver.</footer>
 </main>
@@ -135,22 +149,33 @@ const steps = [
 const nav = document.getElementById("nav");
 const sections = document.getElementById("sections");
 const search = document.getElementById("search");
+const homeView = document.getElementById("homeView");
+const brandLink = document.getElementById("brandLink");
+const startReading = document.getElementById("startReading");
 
 function esc(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 }
 
+const homeBtn = document.createElement("button");
+homeBtn.className = "nav-item active";
+homeBtn.dataset.view = "home";
+homeBtn.innerHTML = `<span class="num">⌂</span><span class="nav-title">Início</span>`;
+homeBtn.onclick = () => showHome();
+nav.appendChild(homeBtn);
+
 steps.forEach((s,i)=>{
   const btn=document.createElement("button");
-  btn.className="nav-item"+(i===0?" active":"");
+  btn.className="nav-item";
   btn.dataset.index=i;
   btn.innerHTML=`<span class="num">${s[0]}</span><span class="nav-title">${esc(s[1])}</span>`;
   btn.onclick=()=>show(i);
   nav.appendChild(btn);
 
   const sec=document.createElement("section");
-  sec.className="section"+(i===0?" active":"");
+  sec.className="section";
   sec.dataset.index=i;
+  sec.id = `passo-${s[0]}`;
   const intro=s[2];
   const items=s.slice(3);
   sec.innerHTML=`
@@ -163,25 +188,49 @@ steps.forEach((s,i)=>{
     </div>
     <div class="callout"><div class="principle">${esc(items[items.length-1])}</div></div>
     <div class="step-links">
-      <button onclick="show(${Math.max(0,i-1)})">← ${i===0?"Início": "Anterior"}</button>
-      <button onclick="show(${Math.min(steps.length-1,i+1)})">${i===steps.length-1?"Voltar ao início":"Próximo"} →</button>
+      <button onclick="${i===0?"showHome()":`show(${i-1})`}">← ${i===0?"Início": "Anterior"}</button>
+      <button onclick="${i===steps.length-1?"showHome()":`show(${i+1})`}">${i===steps.length-1?"Voltar ao início":"Próximo"} →</button>
     </div>`;
   sections.appendChild(sec);
 });
 
 function show(i){
+  homeView.classList.remove("active");
+  homeBtn.classList.remove("active");
   document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
   document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
-  document.querySelector(".main").scrollIntoView({behavior:"smooth",block:"start"});
+  sections.scrollIntoView({behavior:"smooth",block:"start"});
   if(window.innerWidth<=900){
     const active=document.querySelector(`.nav-item[data-index="${i}"]`);
     active?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
   }
 }
 
+function showHome(){
+  homeView.classList.add("active");
+  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));
+  homeBtn.classList.add("active");
+  homeView.scrollIntoView({behavior:"smooth",block:"start"});
+  if(window.innerWidth<=900){
+    homeBtn.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+  }
+}
+
+brandLink.addEventListener("click", (e)=>{
+  e.preventDefault();
+  showHome();
+});
+
+startReading?.addEventListener("click", (e)=>{
+  e.preventDefault();
+  show(0);
+});
+
 search.addEventListener("input",()=>{
   const q=search.value.toLowerCase().trim();
-  document.querySelectorAll(".nav-item").forEach((btn,i)=>{
+  document.querySelectorAll(".nav-item[data-index]").forEach((btn)=>{
+    const i=+btn.dataset.index;
     const match=!q || steps[i].join(" ").toLowerCase().includes(q);
     btn.style.display=match?"flex":"none";
   });
