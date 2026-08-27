@@ -200,8 +200,14 @@ function show(i){
   document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
   document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
   requestAnimationFrame(()=>{
-    const y = sections.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo({top: Math.max(0, y - 8), behavior:"smooth"});
+    setTimeout(()=>{
+      const activeSection = document.querySelector(`.section[data-index="${i}"]`);
+      const sidebar = document.querySelector(".sidebar");
+      const offset = window.innerWidth<=900 ? (sidebar?.getBoundingClientRect().height || 0) : 0;
+      const target = activeSection || sections;
+      const y = target.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo({top: Math.max(0, y - offset - 12), behavior:"smooth"});
+    }, 0);
   });
   if(window.innerWidth<=900){
     const active=document.querySelector(`.nav-item[data-index="${i}"]`);
