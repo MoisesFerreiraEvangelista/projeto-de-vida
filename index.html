@@ -199,10 +199,15 @@ function show(i){
   homeBtn.classList.remove("active");
   document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
   document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",+x.dataset.index===i));
-  sections.scrollIntoView({behavior:"smooth",block:"start"});
+  requestAnimationFrame(()=>{
+    const y = sections.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({top: Math.max(0, y - 8), behavior:"smooth"});
+  });
   if(window.innerWidth<=900){
     const active=document.querySelector(`.nav-item[data-index="${i}"]`);
-    active?.scrollIntoView({behavior:"smooth",inline:"center",block:"nearest"});
+    if(active){
+      nav.scrollTo({left: Math.max(0, active.offsetLeft - 16), behavior:"smooth"});
+    }
   }
 }
 
